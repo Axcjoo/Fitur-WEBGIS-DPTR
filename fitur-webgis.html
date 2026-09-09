@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panduan lengkap fitur WebGIS Dinas Pertanahan dan Tata Ruang Kabupaten Bogor — sistem informasi geografis berbasis web untuk optimalisasi diseminasi data keruangan.">
+    <title>Fitur WebGIS DPTR Kab. Bogor — Panduan Lengkap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #F5EFE6;
+            --surface:   #FAF7F2;
+            --cream:     #E8D5B7;
+            --cream-dk:  #D4B896;
+            --brown:     #5C3D2E;
+            --brown-md:  #7D5A50;
+            --brown-lt:  #A0785A;
+            --terra:     #B85C38;
+            --terra-lt:  #D4774F;
+            --amber:     #C47E1A;
+            --amber-lt:  #E8A838;
+            --olive:     #5C6B2E;
+            --olive-lt:  #7A8C40;
+            --text:      #2E1F0F;
+            --text-md:   #5C4030;
+            --text-dim:  #9A7A60;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* ——— STICKY NAV ——— */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(245,239,230,0.92);
+            backdrop-filter: blur(12px);
+            padding: 14px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 12px rgba(92,61,46,0.1);
+        }
+        .nav-brand {
+            font-size: 14px; font-weight: 800;
+            color: var(--brown);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .nav-brand .dot {
+            width: 10px; height: 10px;
+            background: var(--terra);
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .nav-links {
+            display: flex; gap: 24px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 12px; font-weight: 700;
+            color: var(--text-md);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--terra); }
+
+        /* ——— HERO ——— */
+        .hero {
+            background: linear-gradient(135deg, var(--brown) 0%, var(--brown-md) 100%);
+            color: #fff;
+            padding: 88px 32px 72px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(196,126,26,0.2) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(184,92,56,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 10px; font-weight: 800;
+            letter-spacing: 3px; text-transform: uppercase;
+            padding: 5px 18px; border-radius: 50px;
+            margin-bottom: 22px;
+        }
+        .hero h1 {
+            font-size: clamp(26px, 5vw, 48px);
+            font-weight: 800; line-height: 1.15;
+            margin-bottom: 18px;
+        }
+        .hero h1 span { color: var(--amber-lt); }
+        .hero p {
+            font-size: 15px; color: rgba(255,255,255,0.78);
+            max-width: 640px; margin: 0 auto 32px;
+        }
+        .hero-meta {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            justify-content: center;
+        }
+        .hero-meta span {
+            background: rgba(255,255,255,0.1);
+            font-size: 11px; font-weight: 700;
+            color: rgba(255,255,255,0.85);
+            padding: 5px 16px; border-radius: 50px;
+        }
+
+        /* ——— WRAPPER ——— */
+        .wrapper {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 64px 24px 96px;
+        }
+
+        /* ——— SECTION TITLE ——— */
+        .section-label {
+            font-size: 10px; font-weight: 800;
+            color: var(--terra);
+            letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: clamp(20px, 3vw, 30px);
+            font-weight: 800; color: var(--brown);
+            margin-bottom: 10px;
+        }
+        .section-desc {
+            font-size: 14px; color: var(--text-dim);
+            max-width: 680px; margin-bottom: 40px;
+        }
+
+        /* ——— OVERVIEW STATS ——— */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 72px;
+        }
+        .stat-card {
+            background: var(--cream);
+            border-radius: 18px;
+            padding: 24px 18px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(92,61,46,0.09);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card .ico {
+            font-size: 28px; margin-bottom: 10px;
+        }
+        .stat-card .num {
+            font-size: 30px; font-weight: 800;
+            color: var(--terra);
+        }
+        .stat-card .lbl {
+            font-size: 11px; font-weight: 700;
+            color: var(--text-dim); margin-top: 4px;
+        }
+
+        /* ——— FEATURE SECTIONS ——— */
+        section { margin-bottom: 80px; }
+
+        /* ——— FEATURE CARD ——— */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+        .feature-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 26px 24px;
+            box-shadow: 0 2px 14px rgba(92,61,46,0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(92,61,46,0.13);
+        }
+        .feature-card .fc-icon {
+            font-size: 32px; margin-bottom: 14px;
+        }
+        .feature-card h3 {
+            font-size: 15px; font-weight: 800;
+            color: var(--brown);
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 13px; color: var(--text-dim);
+            line-height: 1.65;
+        }
+        .feature-card .tag {
+            display: inline-block;
+            margin-top: 14px;
+            font-size: 10px; font-weight: 800;
+            letter-spacing: 1px; text-transform: uppercase;
+            background: var(--cream);
+            color: var(--brown-md);
+            padding: 3px 12px; border-radius: 50px;
+        }
+
+        /* ——— LAYER TABLE ——— */
+        .layer-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: var(--surface);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 2px 14px rgba(92,61,46,0.07);
+        }
+        .layer-table thead {
+            background: var(--brown);
+            color: #fff;
+        }
+        .layer-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .layer-table td {
+            padding: 13px 16px;
+            border-top: 1px solid rgba(92,61,46,0.07);
+            color: var(--text-md);
+            font-weight: 500;
+        }
+        .layer-table tr:hover td { background: var(--cream); }
+        .layer-table .badge {
+            display: inline-block;
+            font-size: 10px; font-weight: 800;
+            padding: 2px 10px; border-radius: 50px;
+        }
+        .badge-poly { background: rgba(92,107,46,0.12); color: var(--olive); }
+        .badge-line { background: rgba(184,92,56,0.12); color: var(--terra); }
+
+        /* ——— WORKFLOW STEPS ——— */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .step {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 32px;
+            position: relative;
+        }
+        .step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 19px; top: 44px;
+            width: 2px; height: calc(100% - 20px);
+            background: var(--cream-dk);
+        }
+        .step-num {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brown), var(--brown-md));
+            color: #fff;
+            font-size: 15px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 3px 12px rgba(92,61,46,0.2);
+        }
+        .step-body { flex: 1; padding-top: 6px; }
+        .step-body h3 {
+            font-size: 15px; font-weight: 800;
+            color: var(--brown); margin-bottom: 6px;
+        }
+        .step-body p { font-size: 13px; color: var(--text-dim); }
+
+        /* ——— OUTPUT / HASIL CARDS ——— */
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+        .output-card {
+            background: linear-gradient(135deg, var(--brown) 0%, var(--brown-md) 100%);
+            color: #fff;
+            border-radius: 20px;
+            padding: 26px 22px;
+            box-shadow: 0 4px 20px rgba(92,61,46,0.25);
+            transition: transform 0.2s;
+        }
+        .output-card:hover { transform: translateY(-4px); }
+        .output-card .oc-icon { font-size: 30px; margin-bottom: 12px; }
+        .output-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+        .output-card p { font-size: 12px; color: rgba(255,255,255,0.72); line-height: 1.6; }
+        .output-card.amber { background: linear-gradient(135deg, var(--amber), var(--amber-lt)); color: #3B1A00; }
+        .output-card.amber p { color: rgba(59,26,0,0.65); }
+        .output-card.olive { background: linear-gradient(135deg, var(--olive), var(--olive-lt)); }
+        .output-card.terra { background: linear-gradient(135deg, var(--terra), var(--terra-lt)); }
+
+        /* ——— CONTOH HASIL GAMBAR ——— */
+        .gallery-title {
+            font-size: 16px; font-weight: 800;
+            color: var(--brown);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .gallery-item {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(92,61,46,0.12);
+            transition: transform 0.25s, box-shadow 0.25s;
+            cursor: pointer;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(92,61,46,0.2);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid var(--cream);
+        }
+        .gallery-caption {
+            padding: 16px;
+            text-align: center;
+        }
+        .gallery-caption h4 {
+            font-size: 13px; font-weight: 800;
+            color: var(--brown); margin-bottom: 4px;
+        }
+        .gallery-caption p {
+            font-size: 11px; color: var(--text-dim);
+        }
+        .gallery-large {
+            grid-column: 1 / -1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ——— ZONASI ZONE LIST ——— */
+        .zone-chips {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            margin-top: 16px;
+        }
+        .zone-chip {
+            background: var(--cream);
+            color: var(--brown);
+            font-size: 12px; font-weight: 700;
+            padding: 6px 16px; border-radius: 50px;
+            box-shadow: 0 1px 6px rgba(92,61,46,0.1);
+        }
+
+        /* ——— DIVIDER ——— */
+        .section-divider {
+            height: 1px;
+            background: var(--cream-dk);
+            margin: 72px 0;
+            border-radius: 2px;
+        }
+
+        /* ——— INFO BOX ——— */
+        .info-box {
+            background: var(--cream);
+            border-left: 4px solid var(--terra);
+            border-radius: 0 14px 14px 0;
+            padding: 18px 22px;
+            margin-bottom: 28px;
+            font-size: 13px;
+            color: var(--text-md);
+            line-height: 1.7;
+        }
+        .info-box strong { color: var(--brown); }
+
+        /* ——— FOOTER ——— */
+        footer {
+            background: var(--brown);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 40px 24px;
+            font-size: 12px;
+        }
+        footer strong { color: #fff; }
+
+        @media (max-width: 640px) {
+            nav { padding: 12px 16px; }
+            .nav-links { display: none; }
+            .hero { padding: 60px 20px 48px; }
+            .wrapper { padding: 40px 16px 64px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .output-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+    <div class="nav-brand">
+        <span class="dot"></span>
+        WebGIS DPTR Kab. Bogor
+    </div>
+    <ul class="nav-links">
+        <li><a href="#overview">Ikhtisar</a></li>
+        <li><a href="#layers">Layer Data</a></li>
+        <li><a href="#features">Fitur Utama</a></li>
+        <li><a href="#analisis">Analisis</a></li>
+        <li><a href="#output">Hasil & Output</a></li>
+        <li><a href="#workflow">Alur Kerja</a></li>
+    </ul>
+</nav>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+    <div class="hero-badge">📍 Sistem Informasi Geografis</div>
+    <h1>WebGIS <span>Dinas Pertanahan</span><br>& Tata Ruang Kab. Bogor</h1>
+    <p>Platform pemetaan interaktif berbasis web untuk optimalisasi diseminasi data keruangan, analisis tata ruang, dan pengelolaan informasi spasial wilayah Kabupaten Bogor.</p>
+    <div class="hero-meta">
+        <span>🗺️ Leaflet.js / OpenLayers</span>
+        <span>🌐 GeoServer WMS · WFS</span>
+        <span>🐘 PostgreSQL + PostGIS</span>
+        <span>📊 Analisis Spasial Real-time</span>
+        <span>📱 Responsif & Mobile-Friendly</span>
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <!-- ============ OVERVIEW STATS ============ -->
+    <section id="overview">
+        <p class="section-label">Ikhtisar Sistem</p>
+        <h2 class="section-title">Gambaran Umum WebGIS</h2>
+        <p class="section-desc">WebGIS DPTR Kabupaten Bogor dibangun sebagai platform satu pintu untuk visualisasi, analisis, dan diseminasi data keruangan berbasis teknologi GIS modern.</p>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="ico">🗂️</div>
+                <div class="num">16</div>
+                <div class="lbl">Layer Data Spasial</div>
+            </div>
+            <div class="stat-card">
+                <div class="ico">🗺️</div>
+                <div class="num">20+</div>
+                <div class="lbl">Zona Tata Ruang</div>
+            </div>
+            <div class="stat-card">
+                <div class="ico">⚙️</div>
+                <div class="num">15+</div>
+                <div class="lbl">Fitur Interaktif</div>
+            </div>
+            <div class="stat-card">
+                <div class="ico">📄</div>
+                <div class="num">4</div>
+                <div class="lbl">Format Export</div>
+            </div>
+            <div class="stat-card">
+                <div class="ico">🔍</div>
+                <div class="num">WMS</div>
+                <div class="lbl">Standar Layanan OGC</div>
+            </div>
+            <div class="stat-card">
+                <div class="ico">🔒</div>
+                <div class="num">JWT</div>
+                <div class="lbl">Sistem Autentikasi</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Dasar Hukum Utama:</strong> Seluruh data zonasi dan ketentuan peraturan yang ditampilkan pada WebGIS ini merujuk pada
+            <strong>Peraturan Daerah Kabupaten Bogor Nomor 1 Tahun 2024</strong> tentang Rencana Tata Ruang Wilayah (RTRW) Kabupaten Bogor.
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ LAYER DATA ============ -->
+    <section id="layers">
+        <p class="section-label">Dataset Spasial</p>
+        <h2 class="section-title">Layer Data yang Tersedia</h2>
+        <p class="section-desc">Semua layer dimuat secara dinamis dari GeoServer (WFS) yang terhubung ke database PostgreSQL/PostGIS. Sistem menggunakan strategi BBOX-based loading agar hanya area yang terlihat di viewport yang dimuat.</p>
+
+        <table class="layer-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nama Layer</th>
+                    <th>Nama GeoServer</th>
+                    <th>Tipe</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td><strong>Batas Administrasi Desa</strong></td><td>DPTR:BATAS_ADMINISTRASI_DESA</td><td><span class="badge badge-poly">Poligon</span></td><td>Batas desa/kelurahan seluruh Kab. Bogor</td></tr>
+                <tr><td>2</td><td><strong>Batas Administrasi Kecamatan</strong></td><td>DPTR:BATAS_ADMINISTRASI_KEC</td><td><span class="badge badge-poly">Poligon</span></td><td>Batas 40 kecamatan Kab. Bogor</td></tr>
+                <tr><td>3</td><td><strong>Jaringan Jalan</strong></td><td>DPTR:JARINGAN_JALAN</td><td><span class="badge badge-line">Garis</span></td><td>Jaringan jalan kabupaten, provinsi, nasional</td></tr>
+                <tr><td>4</td><td><strong>Batas DAS</strong></td><td>DPTR:BATAS_DAS</td><td><span class="badge badge-poly">Poligon</span></td><td>Daerah Aliran Sungai Kab. Bogor</td></tr>
+                <tr><td>5</td><td><strong>Danau</strong></td><td>DPTR:DANAU</td><td><span class="badge badge-poly">Poligon</span></td><td>Badan air danau</td></tr>
+                <tr><td>6</td><td><strong>Situ & Danau</strong></td><td>DPTR:SITU_DANAU</td><td><span class="badge badge-poly">Poligon</span></td><td>Situ dan danau kecil</td></tr>
+                <tr><td>7</td><td><strong>Sungai Besar</strong></td><td>DPTR:SUNGAI_AR</td><td><span class="badge badge-poly">Poligon</span></td><td>Area sungai besar sebagai poligon</td></tr>
+                <tr><td>8</td><td><strong>Sungai Kecil</strong></td><td>DPTR:SUNGAI_LN</td><td><span class="badge badge-line">Garis</span></td><td>Jaringan sungai kecil</td></tr>
+                <tr><td>9</td><td><strong>Pola Ruang (RTRW)</strong></td><td>DPTR:POLA_RUANG</td><td><span class="badge badge-poly">Poligon</span></td><td>Pola ruang RTRW Kab. Bogor (utama)</td></tr>
+                <tr><td>10</td><td><strong>LP2B</strong></td><td>DPTR:LP2B</td><td><span class="badge badge-poly">Poligon</span></td><td>Lahan Pertanian Pangan Berkelanjutan</td></tr>
+                <tr><td>11</td><td><strong>KP2B</strong></td><td>DPTR:KP2B</td><td><span class="badge badge-poly">Poligon</span></td><td>Kawasan Pertanian Pangan Berkelanjutan</td></tr>
+                <tr><td>12</td><td><strong>LSD</strong></td><td>DPTR:LSD</td><td><span class="badge badge-poly">Poligon</span></td><td>Lahan Sawah yang Dilindungi</td></tr>
+                <tr><td>13</td><td><strong>LBS</strong></td><td>DPTR:LBS</td><td><span class="badge badge-poly">Poligon</span></td><td>Lahan Baku Sawah</td></tr>
+                <tr><td>14</td><td><strong>KKOP</strong></td><td>DPTR:KKOP</td><td><span class="badge badge-poly">Poligon</span></td><td>Kawasan Keselamatan Operasi Penerbangan</td></tr>
+                <tr><td>15</td><td><strong>Kawasan Rawan Bencana</strong></td><td>DPTR:KRB</td><td><span class="badge badge-poly">Poligon</span></td><td>Zona rawan bencana (banjir, longsor, dll)</td></tr>
+                <tr><td>16</td><td><strong>Sempadan</strong></td><td>DPTR:SEMPADAN</td><td><span class="badge badge-poly">Poligon</span></td><td>Kawasan sempadan sungai, pantai, jalan</td></tr>
+            </tbody>
+        </table>
+
+        <p style="font-size:12px; color:var(--text-dim); margin-top:14px;">
+            🔧 Semua layer menggunakan sistem koordinat <strong>EPSG:4326</strong> (WGS84) di frontend, dikonversi otomatis dari proyeksi asli <strong>EPSG:32748</strong> (UTM Zone 48S) oleh GeoServer.
+        </p>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ FITUR UTAMA ============ -->
+    <section id="features">
+        <p class="section-label">Fitur Interaktif</p>
+        <h2 class="section-title">Fitur Utama WebGIS</h2>
+        <p class="section-desc">WebGIS ini dilengkapi dengan berbagai fitur interaktif yang mendukung kebutuhan analisis tata ruang, diseminasi informasi, dan pengelolaan data spasial secara efisien.</p>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <div class="fc-icon">🗺️</div>
+                <h3>Peta Interaktif Multi-Basemap</h3>
+                <p>Tampilan peta interaktif dengan pilihan basemap: OpenStreetMap, Google Maps (Satellite, Hybrid, Terrain), dan ESRI. Navigasi intuitif dengan zoom, pan, dan rotasi peta.</p>
+                <span class="tag">Leaflet.js</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🔍</div>
+                <h3>Query & Identifikasi Zona</h3>
+                <p>Klik pada area di peta untuk mendapatkan informasi lengkap zona tata ruang (NAMOBJ), termasuk ketentuan peraturan zonasi yang berlaku berdasarkan Perda Kab. Bogor No. 1/2024.</p>
+                <span class="tag">Popup Interaktif</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">✏️</div>
+                <h3>Digitasi & Delineasi AOI</h3>
+                <p>Tools untuk menggambar polygon Area of Interest (AOI) secara langsung di peta. Mendukung pembuatan polygon bebas, persegi, dan lingkaran. Data digitasi tersimpan otomatis di localStorage.</p>
+                <span class="tag">Leaflet Draw</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">⭕</div>
+                <h3>Analisis Buffer</h3>
+                <p>Buat zona buffer dengan radius yang dapat dikustomisasi (dalam meter) dari polygon AOI yang telah didigitasi. Hasil buffer divisualisasikan langsung di peta dengan overlay transparan.</p>
+                <span class="tag">Turf.js</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">📐</div>
+                <h3>Pengukuran Jarak & Luas</h3>
+                <p>Tool pengukuran interaktif untuk menghitung jarak antar titik dan luas area di peta secara real-time. Hasil ditampilkan dalam satuan meter, kilometer, dan hektar.</p>
+                <span class="tag">Leaflet Measure</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🔎</div>
+                <h3>Pencarian Lokasi & Atribut</h3>
+                <p>Fitur pencarian lokasi menggunakan geocoding (Leaflet Photon/Nominatim) dan pencarian atribut dalam layer yang sedang aktif. Hasil pencarian langsung di-zoom ke lokasi terkait.</p>
+                <span class="tag">Geocoding</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">📍</div>
+                <h3>Deteksi Lokasi Pengguna (GPS)</h3>
+                <p>Tombol lokasi saya (GPS) untuk menemukan dan menampilkan posisi pengguna saat ini di peta, dilengkapi lingkaran akurasi yang menunjukkan radius ketidakpastian posisi GPS.</p>
+                <span class="tag">Geolocation API</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🔖</div>
+                <h3>Bookmark View Peta</h3>
+                <p>Simpan posisi dan zoom level peta saat ini sebagai bookmark untuk akses cepat nanti. Maksimal 6 bookmark tersimpan per sesi, dikelola dari panel Ruang Kendali.</p>
+                <span class="tag">LocalStorage</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🔄</div>
+                <h3>Swipe Peta (Layer Comparison)</h3>
+                <p>Fitur swipe interaktif untuk membandingkan dua layer peta secara berdampingan dengan slider yang dapat digeser. Berguna untuk melihat perbedaan kondisi lahan antar layer.</p>
+                <span class="tag">Leaflet Swipe</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">📊</div>
+                <h3>Dashboard Statistik</h3>
+                <p>Dashboard real-time yang menampilkan statistik jumlah fitur tiap layer, status aktif/nonaktif layer, total objek spasial, dan ringkasan operasional data spasial yang tersedia.</p>
+                <span class="tag">Statistik Real-time</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🏙️</div>
+                <h3>Dashboard Kecamatan</h3>
+                <p>Halaman dashboard khusus menampilkan statistik detail per kecamatan: luas wilayah, jumlah desa, komposisi pola ruang, dan data demografi dasar. Mendukung 40 kecamatan Kab. Bogor.</p>
+                <span class="tag">Dashboard Kecamatan</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🎭</div>
+                <h3>Mode Presentasi</h3>
+                <p>Mode layar penuh yang menyembunyikan semua panel UI (sidebar, layer manager, smart panel) agar peta tampil maksimal untuk keperluan presentasi atau demokrasi publik.</p>
+                <span class="tag">Full Screen Mode</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">📱</div>
+                <h3>QR Code Akses Lokasi</h3>
+                <p>Generate QR Code otomatis dari koordinat yang sedang ditampilkan di peta. QR Code dapat dipindai untuk membuka posisi peta yang sama di perangkat lain atau dibagikan ke publik.</p>
+                <span class="tag">QRCode.js</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🗺️</div>
+                <h3>Peta Mini (Mini Map)</h3>
+                <p>Panel mini map di pojok bawah yang menampilkan gambaran area yang lebih luas sebagai referensi orientasi. Dapat ditampilkan atau disembunyikan sesuai kebutuhan pengguna.</p>
+                <span class="tag">Leaflet MiniMap</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🧭</div>
+                <h3>Ruang Kendali (Smart Panel)</h3>
+                <p>Panel insight spasial cepat yang menampilkan status layer aktif, zoom level, koordinat tengah peta, layer prioritas, dan bookmark. Dapat diminimalkan saat tidak dibutuhkan.</p>
+                <span class="tag">Smart Dashboard</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-icon">🌡️</div>
+                <h3>Indeks Kerawanan Lokasi</h3>
+                <p>Perhitungan otomatis skor risiko (0–100) berdasarkan irisan AOI dengan layer sensitif: KRB, LP2B, LSD, Sempadan, KKOP, Danau, dan Sungai. Kategorisasi: Rendah, Sedang, Tinggi.</p>
+                <span class="tag">Risk Scoring</span>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ ANALISIS SPASIAL ============ -->
+    <section id="analisis">
+        <p class="section-label">Analisis Spasial</p>
+        <h2 class="section-title">Fitur Analisis Tata Ruang</h2>
+        <p class="section-desc">Inti dari WebGIS ini adalah kemampuan analisis proporsi lahan yang menghitung irisan antara AOI yang didigitasi pengguna dengan seluruh layer data spasial yang aktif.</p>
+
+        <div class="info-box">
+            <strong>Cara Kerja Analisis:</strong> Pengguna mendigitasi atau mengimpor polygon AOI → Sistem menghitung luas irisan (intersect) antara AOI dengan setiap layer aktif menggunakan Turf.js → Hasil ditampilkan dalam laporan proporsi lahan lengkap dengan persentase dan ketentuan zonasi.
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="fc-icon">📏</div>
+                <h3>Analisis Proporsi Lahan</h3>
+                <p>Hitung secara otomatis luas dan persentase irisan area AOI dengan setiap zona tata ruang yang aktif. Hasil disajikan dalam tabel terurut dengan total luasan delineasi.</p>
+                <span class="tag">Intersect Analysis</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">🏔️</div>
+                <h3>Identifikasi Kawasan Lindung</h3>
+                <p>Deteksi otomatis apakah AOI beririsan dengan kawasan lindung: LP2B, KP2B, LSD, LBS, Sempadan, KKOP, Kawasan Rawan Bencana, Danau, dan Sungai.</p>
+                <span class="tag">Overlay Analysis</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">📋</div>
+                <h3>Ketentuan Peraturan Zonasi</h3>
+                <p>Tampilkan ketentuan peraturan zonasi lengkap (KPZ) dari file Excel "Ketentuan Peraturan Zonasi.xlsx" untuk setiap zona yang ditemukan dalam AOI, termasuk kategori A/B/C/D kegiatan yang diizinkan.</p>
+                <span class="tag">SheetJS XLSX</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">🌡️</div>
+                <h3>Skor Risiko Lokasi</h3>
+                <p>Kalkulasi indeks kerawanan lokasi berdasarkan bobot irisan dengan layer sensitif. KRB (+45), LP2B (+25), LSD (+25), Sempadan (+20), KP2B (+20), KKOP (+15), Danau (+15), Sungai (+15).</p>
+                <span class="tag">Risk Scoring</span>
+            </div>
+        </div>
+
+        <!-- Zona yang didukung -->
+        <div style="margin-top: 36px;">
+            <h3 style="font-size:15px; font-weight:800; color:var(--brown); margin-bottom:6px;">Zona Tata Ruang yang Didukung</h3>
+            <p style="font-size:13px; color:var(--text-dim); margin-bottom:4px;">Berdasarkan pemetaan NAMOBJ dari layer RTRW Kabupaten Bogor:</p>
+            <div class="zone-chips">
+                <span class="zone-chip">Permukiman Perkotaan</span>
+                <span class="zone-chip">Permukiman Perdesaan</span>
+                <span class="zone-chip">Peruntukan Industri</span>
+                <span class="zone-chip">Pariwisata</span>
+                <span class="zone-chip">Tanaman Pangan</span>
+                <span class="zone-chip">Hortikultura</span>
+                <span class="zone-chip">Perkebunan</span>
+                <span class="zone-chip">Peternakan</span>
+                <span class="zone-chip">Hutan Lindung</span>
+                <span class="zone-chip">Hutan Produksi Tetap</span>
+                <span class="zone-chip">Hutan Produksi Terbatas</span>
+                <span class="zone-chip">Cagar Alam</span>
+                <span class="zone-chip">Taman Nasional</span>
+                <span class="zone-chip">Taman Wisata Alam</span>
+                <span class="zone-chip">Perlindungan Setempat</span>
+                <span class="zone-chip">Perikanan Budidaya</span>
+                <span class="zone-chip">Pertambangan Batuan</span>
+                <span class="zone-chip">Keunikan Bentang Alam</span>
+                <span class="zone-chip">Badan Air</span>
+                <span class="zone-chip">Pertahanan Keamanan</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ IMPORT / EXPORT ============ -->
+    <section id="import-export">
+        <p class="section-label">Manajemen Data</p>
+        <h2 class="section-title">Import & Export Data</h2>
+        <p class="section-desc">WebGIS mendukung berbagai format pertukaran data geospasial, memudahkan integrasi dengan perangkat lunak GIS lain seperti QGIS, ArcGIS, dan Google Earth.</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="fc-icon">📥</div>
+                <h3>Import GeoJSON / KML / Shapefile</h3>
+                <p>Impor data spasial dari file GeoJSON, KML, atau Shapefile (.zip) langsung ke peta. Data yang diimpor dapat digunakan sebagai AOI untuk analisis proporsi lahan.</p>
+                <span class="tag">webgis-geo-import-export.js</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">📤</div>
+                <h3>Export Laporan ke PDF</h3>
+                <p>Ekspor laporan analisis spasial lengkap ke format PDF menggunakan html2pdf.js. Laporan mencakup header instansi, total luasan, tabel analisis per zona, dan ketentuan zonasi.</p>
+                <span class="tag">html2pdf.js</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">📊</div>
+                <h3>Export Laporan ke Excel</h3>
+                <p>Ekspor hasil analisis ke format Excel (.xlsx) dengan multi-sheet: Sheet 1 berisi ringkasan analisis, sheet berikutnya berisi detail ketentuan peraturan zonasi per zona yang ditemukan.</p>
+                <span class="tag">SheetJS XLSX</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">🖨️</div>
+                <h3>Cetak Peta (Print Layout)</h3>
+                <p>Fitur cetak peta dengan layout profesional, termasuk judul, legenda, skala, arah utara, dan metadata instansi. Tersedia dalam format A4 Portrait dan Landscape.</p>
+                <span class="tag">webgis-print-layout.js</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ OUTPUT / HASIL ============ -->
+    <section id="output">
+        <p class="section-label">Hasil & Output</p>
+        <h2 class="section-title">Hasil yang Dihasilkan WebGIS</h2>
+        <p class="section-desc">WebGIS DPTR menghasilkan berbagai output yang dapat langsung digunakan untuk keperluan administrasi, kajian tata ruang, dan diseminasi informasi publik.</p>
+
+        <div class="output-grid">
+            <div class="output-card">
+                <div class="oc-icon">📄</div>
+                <h3>Laporan Analisis Spasial (PDF)</h3>
+                <p>Dokumen PDF berisi: header instansi DPTR Kab. Bogor, luas total delineasi, tabel analisis proporsi lahan per zona, indeks kerawanan lokasi, dan catatan ketentuan zonasi.</p>
+            </div>
+            <div class="output-card amber">
+                <div class="oc-icon">📊</div>
+                <h3>Laporan Excel Multi-Sheet</h3>
+                <p>File .xlsx dengan Sheet Ringkasan Analisis + sheet detail per zona, menyertakan seluruh ketentuan peraturan zonasi (KPZ) yang relevan dari Perda No.1/2024.</p>
+            </div>
+            <div class="output-card olive">
+                <div class="oc-icon">🗺️</div>
+                <h3>Cetak Peta Profesional</h3>
+                <p>Layout peta siap cetak format A4 dengan elemen kartografi lengkap: judul, legenda berwarna, skala, arah utara, sumber data, dan metadata peta.</p>
+            </div>
+            <div class="output-card terra">
+                <div class="oc-icon">📱</div>
+                <h3>QR Code Tautan Lokasi</h3>
+                <p>QR Code yang dapat dipindai untuk membuka koordinat peta saat ini. Berguna untuk berbagi lokasi titik survey atau area kajian dengan pihak lain secara cepat.</p>
+            </div>
+            <div class="output-card">
+                <div class="oc-icon">📁</div>
+                <h3>Export Data GeoJSON / KML</h3>
+                <p>Ekspor digitasi AOI atau hasil analisis ke format GeoJSON atau KML untuk digunakan pada software GIS eksternal (QGIS, ArcGIS, Google Earth).</p>
+            </div>
+            <div class="output-card amber">
+                <div class="oc-icon">🌡️</div>
+                <h3>Indeks Kerawanan Lokasi</h3>
+                <p>Skor numerik (0–100) dengan kategorisasi Rendah/Sedang/Tinggi beserta daftar faktor risiko yang teridentifikasi dari hasil irisan AOI dengan layer-layer sensitif.</p>
+            </div>
+        </div>
+
+        <!-- Gallery / Contoh Hasil Nyata -->
+        <h3 class="gallery-title" style="margin-top: 56px;">Contoh Hasil Generate Sistem</h3>
+        <p class="section-desc" style="text-align:center; margin: 0 auto 32px; font-size:13px;">Berikut adalah hasil nyata ekspor data dari sistem WebGIS yang dapat langsung digunakan.</p>
+
+        <!-- 1. PDF & Excel Bersebelahan -->
+        <div class="gallery-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- PDF Viewer -->
+            <div class="gallery-item" style="padding: 20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <div>
+                        <h4 style="font-size:14px; font-weight:800; color:var(--brown);">Laporan Analisis Spasial (PDF)</h4>
+                        <p style="font-size:11px; color:var(--text-dim);">Dokumen formal proporsi lahan.</p>
+                    </div>
+                    <a href="LAPORAN_ANALISIS_SPASIAL_DPTR_2026-07-21.pdf" target="_blank" style="background:var(--terra); color:#fff; padding:6px 12px; text-decoration:none; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap;">Buka Tab</a>
+                </div>
+                <div style="border: 1px solid var(--cream-dk); border-radius: 12px; overflow: hidden; height: 500px;">
+                    <iframe src="LAPORAN_ANALISIS_SPASIAL_DPTR_2026-07-21.pdf" width="100%" height="100%" style="border: none;"></iframe>
+                </div>
+            </div>
+            
+            <!-- Excel Viewer -->
+            <div class="gallery-item" style="padding: 20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <div>
+                        <h4 style="font-size:14px; font-weight:800; color:var(--brown);">Laporan Analisis Multi-Sheet (Excel)</h4>
+                        <p style="font-size:11px; color:var(--text-dim);">Dataset ringkasan & kegiatan diizinkan.</p>
+                    </div>
+                    <a href="LAPORAN_ANALISIS_SPASIAL_DPTR.xlsx" download style="background:var(--olive); color:#fff; padding:6px 12px; text-decoration:none; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap;">Unduh</a>
+                </div>
+                <div style="border: 1px solid var(--cream-dk); border-radius: 12px; overflow: hidden; height: 500px; position: relative;">
+                    <!-- Iframe preview (tergantung dukungan browser/ekstensi) -->
+                    <iframe src="LAPORAN_ANALISIS_SPASIAL_DPTR.xlsx" width="100%" height="100%" style="border: none; position: absolute; z-index: 10;"></iframe>
+                    <!-- Fallback UI jika iframe excel tidak dirender oleh browser -->
+                    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--surface); text-align:center; padding: 20px; z-index: 1;">
+                        <div style="font-size: 40px; margin-bottom:12px;">📊</div>
+                        <a href="LAPORAN_ANALISIS_SPASIAL_DPTR.xlsx" download style="display:inline-block; background:var(--olive); color:#fff; padding:8px 20px; text-decoration:none; border-radius:8px; font-size:12px; font-weight:700;">Unduh File Excel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Peta di Bawah -->
+        <div class="gallery-grid">
+            <div class="gallery-item gallery-large">
+                <img src="Contoh Peta.png" alt="Peta Informasi Spasial Kabupaten Bogor" style="width: 100%; height: auto;">
+                <div class="gallery-caption">
+                    <h4>Peta Informasi Spasial (Format Landscape)</h4>
+                    <p>Contoh layout peta yang dihasilkan sistem dengan legenda, skala, grid koordinat, dan inset.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ ALUR KERJA ============ -->
+    <section id="workflow">
+        <p class="section-label">Panduan Penggunaan</p>
+        <h2 class="section-title">Alur Kerja Analisis Tata Ruang</h2>
+        <p class="section-desc">Berikut adalah langkah-langkah standar penggunaan WebGIS DPTR untuk melakukan analisis proporsi lahan dan menyusun laporan spasial.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <h3>Login & Pilih Basemap</h3>
+                    <p>Masuk ke sistem menggunakan akun yang telah didaftarkan. Pilih basemap yang sesuai (OSM, Satellite, atau Google Maps) sesuai kebutuhan analisis.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <h3>Aktifkan Layer yang Dibutuhkan</h3>
+                    <p>Dari panel Layer Manager, centang layer yang akan dianalisis. Layer utama yang disarankan: Pola Ruang (RTRW), LP2B, LSD, KRB, dan Sempadan. Layer dimuat progresif sesuai viewport.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <h3>Navigasi & Eksplorasi Peta</h3>
+                    <p>Navigasi ke lokasi yang akan dikaji. Gunakan fitur pencarian lokasi atau ketikkan koordinat langsung. Klik area di peta untuk melihat informasi zona tata ruang secara langsung.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <h3>Digitasi atau Import AOI</h3>
+                    <p>Gunakan tool digitasi untuk menggambar Area of Interest (AOI) di peta, atau impor file GeoJSON/KML/Shapefile yang sudah disiapkan sebelumnya. AOI harus berupa polygon tertutup.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <h3>Jalankan Analisis Proporsi Lahan</h3>
+                    <p>Tekan tombol "Analisis" untuk menghitung irisan AOI dengan semua layer aktif. Sistem akan menampilkan tabel proporsi lahan per zona tata ruang beserta persentasenya.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <h3>Tinjau Ketentuan Peraturan Zonasi</h3>
+                    <p>Untuk setiap zona yang ditemukan, sistem otomatis menampilkan Ketentuan Peraturan Zonasi (KPZ) dari Excel berdasarkan Perda No.1/2024. Periksa kegiatan yang diizinkan (A/B/C/D).</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">7</div>
+                <div class="step-body">
+                    <h3>Ekspor Laporan</h3>
+                    <p>Unduh laporan dalam format PDF (untuk arsip formal) atau Excel (untuk pengolahan lanjutan). Gunakan juga fitur cetak peta untuk menghasilkan layout peta siap cetak.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ============ ARSITEKTUR TEKNIS ============ -->
+    <section>
+        <p class="section-label">Arsitektur Teknis</p>
+        <h2 class="section-title">Komponen Teknologi</h2>
+        <p class="section-desc">WebGIS dibangun di atas tumpukan teknologi open-source yang andal, memenuhi standar OGC (Open Geospatial Consortium) untuk interoperabilitas data spasial.</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="fc-icon">🌐</div>
+                <h3>Frontend: Leaflet.js</h3>
+                <p>Library JavaScript pemetaan utama. Mendukung WMS, WFS, GeoJSON, marker clustering, measure tools, draw tools, dan berbagai plugin ekosistem Leaflet.</p>
+                <span class="tag">JavaScript</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">🖥️</div>
+                <h3>GeoServer</h3>
+                <p>Server GIS open-source untuk mempublikasikan data spasial dari PostgreSQL/PostGIS sebagai layanan standar OGC: WMS, WFS, dan WCS. Dioptimalkan dengan GeoWebCache untuk tile caching.</p>
+                <span class="tag">OGC Standard</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">🐘</div>
+                <h3>PostgreSQL + PostGIS</h3>
+                <p>Database relasional PostgreSQL dengan ekstensi PostGIS sebagai backend penyimpanan data spasial. Semua layer geometri disimpan dan dikelola di database ini.</p>
+                <span class="tag">Spatial Database</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">📐</div>
+                <h3>Turf.js</h3>
+                <p>Library analisis spasial JavaScript untuk operasi geometri di browser: intersect, buffer, area, length, booleanContains, dan simplify. Seluruh analisis berjalan di client-side.</p>
+                <span class="tag">Client-side GIS</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">📋</div>
+                <h3>SheetJS (XLSX)</h3>
+                <p>Library untuk membaca file Excel (.xlsx) langsung di browser. Digunakan untuk memuat Ketentuan Peraturan Zonasi dan mengekspor laporan analisis ke format Excel multi-sheet.</p>
+                <span class="tag">Excel Processing</span>
+            </div>
+            <div class="feature-card">
+                <div class="fc-icon">⚡</div>
+                <h3>BBOX-based Progressive Loading</h3>
+                <p>Strategi pemuatan layer yang hanya mengambil data dari GeoServer sesuai area yang terlihat di viewport (BBOX). Dilengkapi tile-grid cache, retry otomatis, dan AbortController.</p>
+                <span class="tag">Optimasi Performa</span>
+            </div>
+        </div>
+    </section>
+
+</div><!-- /wrapper -->
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <p style="margin-bottom:8px;"><strong>WebGIS Dinas Pertanahan dan Tata Ruang Kabupaten Bogor</strong></p>
+    <p style="margin-bottom:6px;">
+        Disusun oleh: <strong>Ardiansyah Adhyaksa Sumarno</strong> &nbsp;·&nbsp; NIM 40003623650105
+    </p>
+    <p style="margin-bottom:4px; font-size:11px;">
+        Dosen Pembimbing: <strong>YOGA KENCANA NUGRAHA, S.T., M.Eng.</strong>
+    </p>
+    <p style="font-size:11px;">
+        Program Studi Perencanaan Tata Ruang dan Pertanahan &nbsp;·&nbsp; Sekolah Vokasi &nbsp;·&nbsp; Kelas VTR-D &nbsp;·&nbsp; Angkatan 2023
+    </p>
+    <p style="margin-top:16px; font-size:11px; opacity:0.5;">© 2026 — Laporan Kerja Praktik</p>
+</footer>
+
+</body>
+</html>
