@@ -389,15 +389,46 @@
         }
         .info-box strong { color: var(--brown); }
 
+        /* ——— KARTU IDENTITAS AKADEMIK ——— */
+        .identity-card {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            background: var(--cream);
+            border-radius: 20px;
+            padding: 32px 36px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(92,61,46,0.08);
+        }
+        .id-block { margin-bottom: 16px; }
+        .id-block:last-child { margin-bottom: 0; }
+        .id-label {
+            font-size: 10px; font-weight: 800; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 2px;
+            display: block; margin-bottom: 4px;
+        }
+        .id-value-main {
+            font-size: 15px; font-weight: 800; color: var(--brown);
+            display: block; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .id-value-sub {
+            font-size: 13px; font-weight: 600; color: var(--text-md);
+            display: block; margin-top: 2px;
+        }
+        .id-value-sm {
+            font-size: 12px; font-weight: 500; color: var(--text-md);
+            display: block; margin-top: 2px;
+        }
+        .id-separator {
+            width: 40px; height: 2px; background: var(--cream-dk);
+            border-radius: 2px; margin: 14px auto;
+        }
+
         /* ——— FOOTER ——— */
         footer {
-            background: var(--brown);
-            color: rgba(255,255,255,0.7);
-            text-align: center;
-            padding: 40px 24px;
-            font-size: 12px;
+            background: var(--surface);
+            padding: 60px 24px;
         }
-        footer strong { color: #fff; }
 
         @media (max-width: 640px) {
             nav { padding: 12px 16px; }
@@ -991,19 +1022,34 @@
 
 </div><!-- /wrapper -->
 
-<!-- ============ FOOTER ============ -->
+<!-- ============ FOOTER & IDENTITAS ============ -->
 <footer>
-    <p style="margin-bottom:8px;"><strong>WebGIS Dinas Pertanahan dan Tata Ruang Kabupaten Bogor</strong></p>
-    <p style="margin-bottom:6px;">
-        Disusun oleh: <strong>Ardiansyah Adhyaksa Sumarno</strong> &nbsp;·&nbsp; NIM 40003623650105
-    </p>
-    <p style="margin-bottom:4px; font-size:11px;">
-        Dosen Pembimbing: <strong>YOGA KENCANA NUGRAHA, S.T., M.Eng.</strong>
-    </p>
-    <p style="font-size:11px;">
-        Program Studi Perencanaan Tata Ruang dan Pertanahan &nbsp;·&nbsp; Sekolah Vokasi &nbsp;·&nbsp; Kelas VTR-D &nbsp;·&nbsp; Angkatan 2023
-    </p>
-    <p style="margin-top:16px; font-size:11px; opacity:0.5;">© 2026 — Laporan Kerja Praktik</p>
+    <div class="identity-card">
+        <!-- Disusun oleh -->
+        <div class="id-block">
+            <span class="id-label">Disusun oleh</span>
+            <span class="id-value-main">Ardiansyah Adhyaksa Sumarno</span>
+            <span class="id-value-sub">40003623650105</span>
+        </div>
+
+        <div class="id-separator"></div>
+
+        <!-- Dibimbing oleh -->
+        <div class="id-block">
+            <span class="id-label">Dibimbing oleh</span>
+            <span class="id-value-sub">YOGA KENCANA NUGRAHA, S.T., M.Eng.</span>
+        </div>
+
+        <div class="id-separator"></div>
+
+        <!-- Program Studi & Lembaga -->
+        <div class="id-block">
+            <span class="id-value-main" style="font-size:13px;">Perencanaan Tata Ruang dan Pertanahan</span>
+            <span class="id-value-sm">Departemen Sipil dan Perencanaan</span>
+            <span class="id-value-sm">Sekolah Vokasi &nbsp;&middot;&nbsp; Angkatan 2023 &nbsp;&middot;&nbsp; Kelas VTR-D</span>
+            <span class="id-value-sm" style="margin-top:8px; font-weight:800; color:var(--brown);">2026</span>
+        </div>
+    </div>
 </footer>
 
 </body>
